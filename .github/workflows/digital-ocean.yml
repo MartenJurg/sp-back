@@ -1,0 +1,44 @@
+name: digital-ocean
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Publish to Github Packages Registry
+        uses: elgohr/Publish-Docker-Github-Action@master
+        with:
+          name: DEVELOPEST/StudentPraxis-back/sp-back
+          registry: docker.pkg.github.com
+          username: ${{ secrets.SP_USERNAME }}
+          password: ${{ secrets.SP_TOKEN }}
+          dockerfile: Dockerfile
+          tags: ${{ github.sha }}
+      - name: Deploy package to digitalocean
+        uses: appleboy/ssh-action@master
+        env:
+          GITHUB_USERNAME: ${{ secrets.SP_USERNAME }}
+          GITHUB_TOKEN: ${{ secrets.SP_TOKEN }}
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          port: ${{ secrets.PORT }}
+          envs: GITHUB_USERNAME, GITHUB_TOKEN
+          script: |
+            docker stop sp-back || true
+            docker system prune -af
+            docker login docker.pkg.github.com -u $GITHUB_USERNAME -p $GITHUB_TOKEN
+            docker run --name=sp-back \
+              --network="api-internal-network" \
+              -p 8080:8080 \
+              -v /opt/sp/config:/config \
+              -v /var/log/sp-back:/logs \
+              -v /opt/sp/files:/files \
+              -d docker.pkg.github.com/developest/studentpraxis-back/sp-back:${{ github.sha }}

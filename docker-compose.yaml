@@ -1,0 +1,25 @@
+version: '3.7'
+services:
+  db:
+    image: postgres
+    container_name: "student_praxis_db"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=some_weak_pass
+      - POSTGRES_DB=student_praxis_db
+    ports:
+      - "5632:5432"
+    volumes:
+      - ./postgres-data/dev:/var/lib/postgresql/data
+
+  tests_db:
+    image: postgres
+    container_name: "student_praxis_tests_db"
+    ports:
+      - "5633:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=some_weak_pass
+      - POSTGRES_DB=student_praxis_db
+    volumes:
+      - ./postgres-data/test:/var/lib/postgresql/data

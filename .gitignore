@@ -1,0 +1,7 @@
+.idea
+!gradle/wrapper/gradle-wrapper.jar
+*.jar
+postgres-data
+/.gtm/
+/files
+/build

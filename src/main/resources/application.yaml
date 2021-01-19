@@ -1,0 +1,89 @@
+info:
+  app:
+    name: Student praxis
+    description: Backend application
+
+server:
+  error:
+    whitelabel:
+      enabled: true
+  port: 8080
+  servlet:
+    context-path: /api
+
+app:
+  jwt:
+    secret: Vwu5uDh4bwCvf8pEopAgnIQho15ss4SgT4oHF4QL0jXT4Swrek3NnyB9NaFdiqE
+    duration: 120
+
+spring:
+  profiles:
+    active: "h2"
+  jackson:
+    default-property-inclusion: non_null
+
+logging:
+  config: classpath:logback-spring.xml
+
+---
+
+spring:
+  profiles: h2
+  jpa:
+    properties:
+      database-platform: org.hibernate.dialect.H2Dialect
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        temp:
+          use_jdbc_metadata_defaults: false
+    hibernate:
+      ddl-auto: none
+  datasource:
+    url: jdbc:h2:~/testdb;AUTO_SERVER=TRUE
+    driverClassName: org.h2.Driver
+    username: test
+    password: test
+  h2:
+    console:
+      enabled: true
+logging:
+  level:
+    ROOT: DEBUG
+  file:
+    name: logs/h2
+    path: .
+
+---
+
+spring:
+  profiles: postgres
+  jpa:
+    open-in-view: false
+    database: POSTGRESQL
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        current_session_context_class: thread
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        default_schema: sp
+        jdbc:
+          lob:
+            non_contextual_creation: true
+  datasource:
+    url: jdbc:postgresql://localhost:5632/student_praxis_db
+    username: postgres
+    password: some_weak_pass
+    platform: postgres
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+logging:
+  level:
+    ROOT: DEBUG
+  file:
+    name: /logs/postgres
+    path: .
